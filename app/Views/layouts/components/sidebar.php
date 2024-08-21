@@ -25,15 +25,15 @@
         <div id="collapseShow" class="collapse" aria-labelledby="headingShow" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="<?= base_url('tiket') ?>">Show</a>
-                <a class="collapse-item" href="#">Teater</a>
-                <a class="collapse-item" href="#">Jadwal</a>
+                <a class="collapse-item" href="<?= base_url('theaters') ?>">Teater</a>
+                <a class="collapse-item" href="<?= base_url('showtime') ?>">Jadwal</a>
             </div>
         </div>
     </li>
     <!-- <hr class="sidebar-divider"> -->
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="tables.html">
+        <a class="nav-link" href="<?= base_url('orders') ?>">
             <i class="fas fa-fw fa-shopping-cart"></i>
             <span>Order</span></a>
     </li>
@@ -55,7 +55,7 @@
     <!-- <hr class="sidebar-divider"> -->
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="tables.html">
+        <a class="nav-link" href="<?= base_url('users') ?>">
             <i class="fas fa-fw fa-users"></i>
             <span>Users</span></a>
     </li>

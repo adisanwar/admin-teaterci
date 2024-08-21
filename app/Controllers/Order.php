@@ -34,7 +34,7 @@ class Order extends BaseController
         $authToken = session()->get('auth_token');
 
         // Lakukan permintaan GET ke API untuk mendapatkan data show saat ini
-        $response = $client->get($this->baseApiUrl . '/order/current', [
+        $response = $client->get($this->baseApiUrl . '/orders', [
             'headers' => $this->headers, // Menggunakan header dari constructor
         ]);
 
@@ -44,7 +44,7 @@ class Order extends BaseController
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
             // Kirim data ke view
-            return view('layouts/components/order/order', ['shows' => $responseData['data']]);
+            return view('layouts/components/order/order', ['orders' => $responseData['data']]);
         } else {
             // Tangani error jika API mengembalikan error
             return view('layouts/components/order/order', ['error' => 'Failed to retrieve data from API']);

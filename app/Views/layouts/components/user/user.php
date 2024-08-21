@@ -2,28 +2,22 @@
 <?= $this->section('content') ?>
 <!-- Mulai Konten Halaman -->
 <div class="container-fluid">
-    <!-- Judul Halaman -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Show data</h1>
+        <h1 class="h3 mb-0 text-gray-800">User Data</h1>
     </div>
 
-    <?php
-    if (session()->getFlashData('success')) {
-    ?>
+    <?php if (session()->getFlashData('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= session()->getFlashData('success') ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-    <?php
-    }
-    ?>
+    <?php endif; ?>
 
-    <!-- Tabel Data Customer -->
     <div class="card shadow mb-4">
         <div class="card-header">
-            <a href="" data-target="#tambahShow" data-toggle="modal" class="btn btn-sm btn-primary">Tambah Customer</a>
+            <a href="#" data-target="#tambahUser" data-toggle="modal" class="btn btn-sm btn-primary">Tambah User</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -31,152 +25,122 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Title</th>
-                            <th>Foto</th>
-                            <th>Description</th>
-                            <th>Duration</th>
-                            <th>Price</th>
-                            <th>Theater</th>
-                            <th>Show Date</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (isset($shows) && is_array($shows)): ?>
+                        <?php if (isset($users) && is_array($users)): ?>
                             <?php $no = 1; ?>
-                            <?php foreach ($shows as $shw): ?>
+                            <?php foreach ($users as $user): ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
-                                    <td><?= $shw['title'] ?></td>
-                                    <td><?= $shw['photo'] ?></td>
-                                    <td><?= $shw['description'] ?></td>
-                                    <td><?= $shw['duration'] ?></td>
-                                    <td><?= $shw['price'] ?></td>
-                                    <td><?= $shw['theater']['name'] ?></td>
-                                    <td><?= date('D d F Y', strtotime($shw['showtime']['showDate'])) ?></td>
+                                    <td><?= isset($user['name']) ? $user['name'] : 'N/A' ?></td>
+                                    <td><?= isset($user['username']) ? $user['username'] : 'N/A' ?></td>
+                                    <td><?= isset($user['isAdmin']) && $user['isAdmin'] ? 'Yes' : 'No' ?></td>
                                     <td>
-                                        <a href="#" data-toggle="modal" data-target="#editShow<?= $shw['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="<?= base_url('/show/delete/' . $shw['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this show?')">Delete</a>
+                                        <a href="#" data-toggle="modal" data-target="#editUser<?= $user['username']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                                        <form action="<?= base_url('/users/delete/' . $user['username']) ?>" method="post" style="display:inline;">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8">No shows available.</td>
+                                <td colspan="5">No users available.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
+
                 </table>
+            </div>
+        </div>
+    </div>
 
-
-                <!-- Modal Edit Show -->
-                <?php foreach ($shows as $show) : ?>
-                    <div class="modal fade" id="editShow<?= $show['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editShowLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editShowLabel">Edit Show</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="<?php echo base_url('/show/update/' . $show['id']) ?>" method="post">
-                                    <input type="hidden" name="_method" value="PATCH">    
-                                    <div class="form-group">
-                                            <label for="title" class="col-form-label">Title</label>
-                                            <input type="text" class="form-control" id="title" name="title" value="<?= $show['title'] ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="description" class="col-form-label">Description</label>
-                                            <textarea class="form-control" id="description" name="description"><?= $show['description'] ?></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="duration" class="col-form-label">Duration</label>
-                                            <input type="text" class="form-control" id="duration" name="duration" value="<?= $show['duration'] ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="price" class="col-form-label">Price</label>
-                                            <input type="text" class="form-control" id="price" name="price" value="<?= $show['price'] ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="theater_name" class="col-form-label">Theater Name</label>
-                                            <input type="text" class="form-control" id="theater_name" name="theater_name" value="<?= $show['theater']['name'] ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="showDate" class="col-form-label">Show Date</label>
-                                            <input type="date" class="form-control" id="showDate" name="showDate" value="<?= date('Y-m-d', strtotime($show['showtime']['showDate'])) ?>">
-                                        </div>
-                                        <div class="form-group" style="display: none;">
-                                            <label for="updated_at"></label>
-                                            <input type="date" id="updated_at" name="updated_at" value="<?= date('Y-m-d') ?>" required>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Modal Edit User -->
+    <?php foreach ($users as $user): ?>
+        <div class="modal fade" id="editUser<?= $user['username']; ?>" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserLabel">Edit User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                <?php endforeach; ?>
-
-                <!-- Modal Tambah Show -->
-                <div class="modal fade" id="tambahShow" tabindex="-1" role="dialog" aria-labelledby="tambahShowLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="tambahShowLabel">Tambah Data Show</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                    <div class="modal-body">
+                        <form action="<?= base_url('/users/update/' . $user['username']) ?>" method="post">
+                            <input type="hidden" name="_method" value="PATCH">
+                            <div class="form-group">
+                                <label for="name" class="col-form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="<?= $user['name'] ?>">
                             </div>
-                            <div class="modal-body">
-                                <form action="<?= base_url('/show/store'); ?>" method="post">
-                                    <div class="form-group">
-                                        <label for="title" class="col-form-label">Title</label>
-                                        <input type="text" class="form-control" id="title" name="title">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="description" class="col-form-label">Description</label>
-                                        <textarea class="form-control" id="description" name="description"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="duration" class="col-form-label">Duration</label>
-                                        <input type="text" class="form-control" id="duration" name="duration">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="price" class="col-form-label">Price</label>
-                                        <input type="text" class="form-control" id="price" name="price">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="theater_name" class="col-form-label">Theater Name</label>
-                                        <input type="text" class="form-control" id="theater_name" name="theater_name">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="showDate" class="col-form-label">Show Date</label>
-                                        <input type="date" class="form-control" id="showDate" name="showDate">
-                                    </div>
-                                    <div class="form-group" style="display: none;">
-                                        <label for="created_at"></label>
-                                        <input type="date" id="created_at" name="created_at" value="<?= date('Y-m-d') ?>" required>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Tambah</button>
-                                    </div>
-                                </form>
+                            <div class="form-group">
+                                <label for="isAdmin" class="col-form-label">Admin</label>
+                                <input type="checkbox" id="isAdmin" name="isAdmin" <?= $user['isAdmin'] ? 'checked' : '' ?>>
                             </div>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
 
-                <!-- /.container-fluid -->
-                <script>
-                    // Panggil plugin dataTables jQuery
-                    $(document).ready(function() {
-                        $('#dataTable').DataTable();
-                    });
-                </script>
-                <?= $this->endSection() ?>
+    <!-- Modal Tambah User -->
+    <div class="modal fade" id="tambahUser" tabindex="-1" role="dialog" aria-labelledby="tambahUserLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tambahUserLabel">Tambah User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('/users/store'); ?>" method="post">
+                        <div class="form-group">
+                            <label for="name" class="col-form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="username" class="col-form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="isAdmin" class="col-form-label">Admin</label>
+                            <input type="checkbox" id="isAdmin" name="isAdmin">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Tambah</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable();
+        });
+    </script>
+</div>
+
+<!-- /.container-fluid -->
+<script>
+    // Panggil plugin dataTables jQuery
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    });
+</script>
+<?= $this->endSection() ?>

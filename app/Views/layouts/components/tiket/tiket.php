@@ -41,8 +41,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                    <?php if (isset($tickets) && is_array($tickets)): ?>
                         <?php $no = 1; ?>
-                        <?php foreach ($data as $ticket): ?>
+                        <?php foreach ($tickets as $ticket): ?>
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td><?= $ticket['show']['title'] ?></td>
@@ -60,6 +61,11 @@
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8">No shows available.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

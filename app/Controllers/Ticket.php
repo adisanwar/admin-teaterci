@@ -43,7 +43,7 @@ class Ticket extends BaseController
         // Decode respons JSON ke array PHP
         $responseData = json_decode($response->getBody(), true);
 
-        var_dump($responseData);
+        // var_dump($responseData);
 
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
