@@ -3,8 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
-use Error;
+use GuzzleHttp\Client;
 
 class Theater extends BaseController
 {
@@ -12,10 +11,16 @@ class Theater extends BaseController
     private $headers;
     private $baseApiUrl;
 
+    public $baseImgUrl;
+
     public function __construct()
     {
         // Inisialisasi base URL dan header
         $this->baseApiUrl = env('EXTERNAL_API_BASE_URL');
+
+        $this->baseImgUrl = env('EXTERNAL_IMG_BASE_URL');
+
+
 
         // Ambil token dari sesi dan set ke header jika ada
         $authToken = session()->get('auth_token');
@@ -29,7 +34,7 @@ class Theater extends BaseController
     }
     public function index()
     {
-        $client = service('curlrequest');
+        $client = new Client();
 
         $authToken = session()->get('auth_token');
 
@@ -44,144 +49,195 @@ class Theater extends BaseController
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
             // Kirim data ke view
-            return view('layouts/components/show/teater', ['theaters' => $responseData['data']]);
+            return view('layouts/components/show/teater', [
+                'theaters' => $responseData['data'],
+                'baseImgUrl' => $this->baseImgUrl,
+            ]);
         } else {
             // Tangani error jika API mengembalikan error
             return view('layouts/components/show/teater', ['error' => 'Failed to retrieve data from API']);
         }
     }
 
-    // public function store()
-    // {
-    //     $client = service('curlrequest');
-
-    //     // Ambil data dari request POST
-    //     $name = $this->request->getPost('name');
-    //     $location = $this->request->getPost('location');
-    //     $capacity = $this->request->getPost('capacity');
-
-    //     // Siapkan data untuk dikirim ke API
-    //     $data = [
-    //         'name'     => $name,
-    //         'location' => $location,
-    //         'capacity' => $capacity,
-    //     ];
-
-    //     try {
-    //         // Kirim data ke API
-    //         $response = $client->post($this->baseApiUrl . '/theaters', [
-    //             'headers' => $this->headers,
-    //             'form_params' => $data,
-    //         ]);
-
-    //         // Periksa apakah respons berhasil
-    //         if ($response->getStatusCode() === 201) {
-    //             return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
-    //         } else {
-    //             // Dapatkan pesan error dari API jika ada
-    //             $error = $response->getBody();
-    //             return redirect()->back()->with('error', 'Failed to add theater. ' . $error);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
-    //     }
-    // }
 
     public function store()
-{
-    $client = service('curlrequest');
+    {
+        $client = new Client(); // Ensure you are using the correct namespace
+    
+        // Retrieve data from the POST request
+        $post = $this->request->getPost();
+        $photo = $this->request->getFile('photo');
 
-    // Retrieve data from the POST request
-    $name = $this->request->getPost('name');
-    $location = $this->request->getPost('location');
-    $capacity = $this->request->getPost('capacity');
-    $photo = $this->request->getFile('photo');
-
-    // Create the data array for form data
-    $data = [
-        [
-            'name'     => 'name',
-            'contents' => $name
-        ],
-        [
-            'name'     => 'location',
-            'contents' => $location
-        ],
-        [
-            'name'     => 'capacity',
-            'contents' => $capacity
-        ]
-    ];
-
-    // Handle photo upload if a file was uploaded
-    if ($photo && $photo->isValid() && !$photo->hasMoved()) {
-        $data[] = [
-            'name'     => 'photo',
-            'contents' => fopen($photo->getTempName(), 'r'),
-            'filename' => $photo->getClientName() // Add the original filename
-        ];
-    }
-
-    var_dump($data);
-
-    try {
-        // Send the request to the API
-        $response = $client->post($this->baseApiUrl . '/theaters', [
-            'headers'  => $this->headers,
-            'multipart' => $data // Use multipart for file uploads
-        ]);
-
-        // Check if the request was successful
-        if ($response->getStatusCode() === 201) {
-            return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
-        } else {
-            // Get error message from the API if any
-            $error = $response->getBody();
-            return redirect()->back()->with('error', 'Failed to add theater. ' . $error);
+        if (
+            !$this->validate([
+                'name' => 'required',
+                'photo' => 'uploaded[image]|is_image[image]|max_size[image,1024]',
+                'price' => 'required|numeric',
+                'location' => 'required',
+                'capacity' => 'required',
+            ])
+        ) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+    
+        // Create the data array for form data
+        $data = [
+            [
+                'name'     => 'name',
+                'contents' => $post['name']
+            ],
+            [
+                'name'     => 'location',
+                'contents' => $post['location']
+            ],
+            [
+                'name' => 'photo',
+                'contents' => fopen($photo->getRealPath(), 'r'),
+                'filename' => $photo->getClientName(),
+                'headers' => ['Content-Type' => $photo->getClientMimeType()],
+            ],
+            [
+                'name'     => 'capacity',
+                'contents' => $post['capacity']
+            ]
+        ];
+
+        // $data = [];
+    
+        // // Check and add only non-empty fields to the data array
+        // if (!empty($post['name'])) {
+        //     $data[] = [
+        //         'name'     => 'name',
+        //         'contents' => $post['name']
+        //     ];
+        // }
+    
+        // if (!empty($post['location'])) {
+        //     $data[] = [
+        //         'name'     => 'location',
+        //         'contents' => $post['location']
+        //     ];
+        // }
+    
+        // if (!empty($post['capacity'])) {
+        //     $data[] = [
+        //         'name'     => 'capacity',
+        //         'contents' => $post['capacity']
+        //     ];
+        // }
+    
+        // if ($photo && $photo->isValid() && !$photo->hasMoved()) {
+        //     $data[] = [
+        //         'name' => 'photo',
+        //         'contents' => fopen($photo->getRealPath(), 'r'),
+        //         'filename' => $photo->getClientName(),
+        //         'headers' => ['Content-Type' => $photo->getClientMimeType()],
+        //     ];
+        // }
+    
+        try {
+            // Send the request to the API
+            $response = $client->post($this->baseApiUrl . '/theaters', [
+                'headers'  => $this->headers,
+                'multipart' => $data
+            ]);
+    
+            $body = $response->getBody();
+            $responseArray = json_decode($body, true);
+    
+            if (isset($responseArray['error'])) {
+                return redirect()->back()->withInput()->with('errors', $responseArray['error']);
+            }
+    
+            return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
+        } catch (\Exception $e) {
+            log_message('error', 'API request error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add theater. ' . $e->getMessage());
+        }
     }
-}
+    
 
 
     public function update($id)
     {
-        $client = service('curlrequest');
-
-        // Ambil data dari request POST
-        $data = [
-            'name' => $this->request->getPost('name'),
-            'location' => $this->request->getPost('location'),
-            'capacity' => $this->request->getPost('capacity'),
-        ];
-
-        // Handle file upload jika ada
-        if ($this->request->getFile('photo')->isValid()) {
-            $photo = $this->request->getFile('photo');
-            $photoName = $photo->getRandomName();
-            $photo->move(WRITEPATH . 'uploads', $photoName);
-            $data['photo'] = $photoName;
+        $client = new \GuzzleHttp\Client();
+    
+        // Retrieve data from the POST request
+        $post = $this->request->getPost();
+        $photo = $this->request->getFile('photo');
+    
+        // Initialize an empty data array for form data
+        $data = [];
+    
+        // Check and add only non-empty fields to the data array
+        if (!empty($post['name'])) {
+            $data[] = [
+                'name'     => 'name',
+                'contents' => $post['name']
+            ];
+        }
+    
+        if (!empty($post['location'])) {
+            $data[] = [
+                'name'     => 'location',
+                'contents' => $post['location']
+            ];
+        }
+    
+        if (!empty($post['capacity'])) {
+            $data[] = [
+                'name'     => 'capacity',
+                'contents' => $post['capacity']
+            ];
+        }
+    
+        
+        if ($photo && $photo->isValid() && !$photo->hasMoved()) {
+            log_message('debug', 'File is valid and ready for upload: ' . $photo->getClientName());
+            $data[] = [
+                'name' => 'photo',
+                'contents' => fopen($photo->getRealPath(), 'r'),
+                'filename' => $photo->getClientName(),
+                'headers' => ['Content-Type' => $photo->getClientMimeType()],
+            ];
+        } else {
+            log_message('debug', 'No valid file uploaded or file has already been moved.');
         }
 
-        // Lakukan permintaan PATCH ke API untuk mengedit data yang ada
-        $response = $client->patch($this->baseApiUrl . '/theaters/' . $id, [
-            'headers' => $this->headers,
-            'form_params' => $data,
-        ]);
+        // var_dump($data);
+        // var_dump($photo);
 
-        // Periksa apakah respons berhasil
-        if ($response->getStatusCode() === 200) {
-            return redirect()->to('/theaters')->with('success', 'Theater successfully updated.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to update theater.');
+       
+        // Proceed only if there is data to update
+        if (empty($data)) {
+            return redirect()->back()->with('error', 'No data provided to update.');
+        }
+    
+        try {
+            // Send the request to the API using PATCH method
+            $response = $client->patch($this->baseApiUrl . '/theaters/' . $id, [
+                'headers' => $this->headers,
+                'multipart' => $data,  // Use multipart for file uploads and form data
+            ]);
+    
+            // Check if the request was successful
+            if ($response->getStatusCode() !== 200) {
+                return redirect()->back()->with('error', 'Failed to update theater.');
+            } else {
+                return redirect()->to('/theaters')->with('success', 'Theater successfully updated.');
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'API request error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update theater. ' . $e->getMessage());
         }
     }
+    
+    
 
 
     public function delete($id)
     {
-        $client = service('curlrequest');
+        $client = new Client();
 
         // Lakukan permintaan DELETE ke API untuk menghapus data
         $response = $client->delete($this->baseApiUrl . '/theaters/' . $id, [

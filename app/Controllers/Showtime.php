@@ -48,41 +48,63 @@ class Showtime extends BaseController
     }
 
     public function store()
-    {
-        $client = service('curlrequest');
+{
+    $client = service('curlrequest');
 
-        // Ambil data dari request POST
-        $data = [
-            'showDate' => $this->request->getPost('showDate'),
-            'showTime' => $this->request->getPost('showTime'),
-        ];
+    // Retrieve the date from POST request
+    $showDate = $this->request->getPost('showDate'); // Expected format: YYYY-MM-DD
+    $showTime = $this->request->getPost('showTime'); 
 
-        // Lakukan permintaan POST ke API untuk menyimpan data baru
-        $response = $client->post($this->baseApiUrl . '/showtime', [
-            'headers' => $this->headers,
-            'form_params' => $data,
-        ]);
+    // Convert the date to an ISO-8601 format with time
+    $dateTime = new \DateTime($showDate . ' 00:00:00');
+    $formattedDateTime = $dateTime->format(\DateTime::ATOM); // ISO-8601 format
 
-        // Periksa apakah respons berhasil
-        if ($response->getStatusCode() === 201) {
-            return redirect()->to('/showtime')->with('success', 'Showtime successfully added.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to add showtime.');
-        }
+    // Prepare data array with the formatted date
+    $data = [
+        'showDate' => $formattedDateTime,
+        'showTime' => $showTime,
+    ];
+
+    var_dump($data);
+
+    // Send the data via POST to an API
+    $response = $client->post($this->baseApiUrl . '/showtimes', [
+        'headers' => $this->headers,
+        'form_params' => $data,
+    ]);
+
+    // Handle the response
+    if ($response->getStatusCode() === 201) {
+        return redirect()->to('/showtime')->with('success', 'Showtime successfully added.');
+    } else {
+        return redirect()->back()->with('error', 'Failed to add showtime.');
     }
+}
+
+    
+
 
     public function update($id)
     {
         $client = service('curlrequest');
 
-        // Ambil data dari request POST
-        $data = [
-            'showDate' => $this->request->getPost('showDate'),
-            'showTime' => $this->request->getPost('showTime'),
-        ];
+    // Retrieve the date from POST request
+    $showDate = $this->request->getPost('showDate'); // Expected format: YYYY-MM-DD
+    $showTime = $this->request->getPost('showTime'); 
+    
+    // Convert the date to an ISO-8601 format with time
+    $dateTime = new \DateTime($showDate . ' 00:00:00');
+    $formattedDateTime = $dateTime->format(\DateTime::ATOM); // ISO-8601 format
 
+    // Prepare data array with the formatted date
+    $data = [
+        'showDate' => $formattedDateTime,
+        'showTime' => $showTime,
+    ];
+
+        var_dump($data);
         // Lakukan permintaan PATCH ke API untuk mengedit data yang ada
-        $response = $client->patch($this->baseApiUrl . '/showtime/' . $id, [
+        $response = $client->patch($this->baseApiUrl . '/showtimes/' . $id, [
             'headers' => $this->headers,
             'form_params' => $data,
         ]);

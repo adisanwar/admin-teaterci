@@ -7,18 +7,23 @@
         <h1 class="h3 mb-0 text-gray-800">Show data</h1>
     </div>
 
-    <?php
-    if (session()->getFlashData('success')) {
-    ?>
+    <?php if (session()->getFlashData('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= session()->getFlashData('success') ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-    <?php
-    }
-    ?>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashData('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= session()->getFlashData('error') ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
 
     <!-- Tabel Data Customer -->
     <div class="card shadow mb-4">
@@ -48,7 +53,17 @@
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= $shw['title'] ?></td>
-                                    <td><?= $shw['photo'] ?></td>
+                                    <td>
+                                        <?php if ($shw['photo']): ?>
+                                            <?php
+                                            // Remove 'src/img/' from the path
+                                            $cleanedPhotoPath = str_replace('src/img/', '', $shw['photo']);
+                                            ?>
+                                            <img src="<?= esc($baseImgUrl . $cleanedPhotoPath) ?>" alt="Show Photo" width="100">
+                                        <?php else: ?>
+                                            No Photo
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?= $shw['description'] ?></td>
                                     <td><?= $shw['duration'] ?></td>
                                     <td><?= $shw['price'] ?></td>
@@ -56,7 +71,11 @@
                                     <td><?= date('D d F Y', strtotime($shw['showtime']['showDate'])) ?></td>
                                     <td>
                                         <a href="#" data-toggle="modal" data-target="#editShow<?= $shw['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="<?= base_url('/show/delete/' . $shw['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this show?')">Delete</a>
+                                        <form action="<?= base_url('/show/delete/' . $shw['id']) ?>" method="post" style="display:inline;">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete theater ID')">Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -81,9 +100,9 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="<?php echo base_url('/show/update/' . $show['id']) ?>" method="post">
-                                    <input type="hidden" name="_method" value="PATCH">    
-                                    <div class="form-group">
+                                    <form action="<?= base_url('/show/update/' . $show['id']) ?>" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="_method" value="PATCH">
+                                        <div class="form-group">
                                             <label for="title" class="col-form-label">Title</label>
                                             <input type="text" class="form-control" id="title" name="title" value="<?= $show['title'] ?>">
                                         </div>
@@ -97,20 +116,51 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="price" class="col-form-label">Price</label>
-                                            <input type="text" class="form-control" id="price" name="price" value="<?= $show['price'] ?>">
+                                            <input type="number" class="form-control" id="price" name="price" value="<?= $show['price'] ?>">
                                         </div>
                                         <div class="form-group">
-                                            <label for="theater_name" class="col-form-label">Theater Name</label>
-                                            <input type="text" class="form-control" id="theater_name" name="theater_name" value="<?= $show['theater']['name'] ?>">
+                                            <label for="price" class="col-form-label">Rating</label>
+                                            <input type="text" class="form-control" id="rating" name="rating" value="<?= $show['rating'] ?>">
                                         </div>
                                         <div class="form-group">
-                                            <label for="showDate" class="col-form-label">Show Date</label>
-                                            <input type="date" class="form-control" id="showDate" name="showDate" value="<?= date('Y-m-d', strtotime($show['showtime']['showDate'])) ?>">
-                                        </div>
+                                        <label for="theaterId" class="col-form-label">Theater</label>
+                                        <select class="form-control" id="theaterId" name="theaterId">
+                                            <?php foreach ($theaters as $theater): ?>
+                                                <option value="<?= $theater['id']; ?>"><?= $theater['name']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                        <div class="form-group">
+                                        <label for="showtimeId" class="col-form-label">Show Date</label>
+                                        <select class="form-control" id="showtimeId" name="showtimeId">
+                                            <?php foreach ($showtimes as $showtime): ?>
+                                                <option value="<?= $showtime['id']; ?>"><?= date('D Y-m-d', strtotime($showtime['showDate'])) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <label for="created_at"></label>
+                                        <input type="date" id="created_at" name="created_at" value="<?= date('Y-m-d') ?>" required>
+                                    </div>
                                         <div class="form-group" style="display: none;">
                                             <label for="updated_at"></label>
                                             <input type="date" id="updated_at" name="updated_at" value="<?= date('Y-m-d') ?>" required>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="photo" class="col-form-label">Foto</label>
+                                            <input type="file" class="form-control" id="photo" name="photo">
+                                        </div>
+                                        <br>
+
+                                        <?php if ($show['photo']): ?>
+                                            <?php
+                                            // Remove 'src/img/' from the path
+                                            $cleanedPhotoPath = str_replace('src/img/', '', $show['photo']);
+                                            ?>
+                                            <img src="<?= esc($baseImgUrl . $cleanedPhotoPath) ?>" alt="Show Photo" width="400">
+                                        <?php else: ?>
+                                            No Photo
+                                        <?php endif; ?>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                             <button type="submit" class="btn btn-primary">Save</button>
@@ -132,10 +182,10 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                <form action="<?= base_url('/show/store'); ?>" method="post">
+                            <div class="modal-body"> 
+                                <form action="<?= base_url('/show/store'); ?>" method="post"  enctype="multipart/form-data">
                                     <div class="form-group">
-                                        <label for="title" class="col-form-label">Title</label>
+                                        <label for="title" class="col-form-label">Title</label> 
                                         <input type="text" class="form-control" id="title" name="title">
                                     </div>
                                     <div class="form-group">
@@ -147,20 +197,36 @@
                                         <input type="text" class="form-control" id="duration" name="duration">
                                     </div>
                                     <div class="form-group">
+                                        <label for="duration" class="col-form-label">Rating</label>
+                                        <input type="text" class="form-control" id="rating" name="rating">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="price" class="col-form-label">Price</label>
-                                        <input type="text" class="form-control" id="price" name="price">
+                                        <input type="number" class="form-control" id="price" name="price">
                                     </div>
                                     <div class="form-group">
-                                        <label for="theater_name" class="col-form-label">Theater Name</label>
-                                        <input type="text" class="form-control" id="theater_name" name="theater_name">
+                                        <label for="theaterId" class="col-form-label">Theater</label>
+                                        <select class="form-control" id="theaterId" name="theaterId">
+                                            <?php foreach ($theaters as $theater): ?>
+                                                <option value="<?= $theater['id']; ?>"><?= $theater['name']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="showDate" class="col-form-label">Show Date</label>
-                                        <input type="date" class="form-control" id="showDate" name="showDate">
+                                        <label for="showtimeId" class="col-form-label">Show Date</label>
+                                        <select class="form-control" id="showtimeId" name="showtimeId">
+                                            <?php foreach ($showtimes as $showtime): ?>
+                                                <option value="<?= $showtime['id']; ?>"><?= date('D Y-m-d', strtotime($showtime['showDate'])) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div class="form-group" style="display: none;">
                                         <label for="created_at"></label>
                                         <input type="date" id="created_at" name="created_at" value="<?= date('Y-m-d') ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="photo" class="col-form-label"> Upload Foto</label>
+                                        <input type="file" class="form-control" id="photo" name="photo">
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
