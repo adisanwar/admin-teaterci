@@ -26,26 +26,27 @@ class Users extends BaseController
     }
 
     public function index()
-    {
-        $client = service('curlrequest');
+{
+    $client = service('curlrequest');
 
-        // Lakukan permintaan GET ke API untuk mendapatkan data user
-        $response = $client->get($this->baseApiUrl . '/users/current', [
-            'headers' => $this->headers,
-        ]);
+    $response = $client->get($this->baseApiUrl . '/users/current', [
+        'headers' => $this->headers,
+    ]);
 
-        // Decode respons JSON ke array PHP
-        $responseData = json_decode($response->getBody(), true);
+    $responseData = json_decode($response->getBody(), true);
 
-        // Periksa apakah respons berhasil
-        if ($response->getStatusCode() === 200) {
-            // Kirim data ke view
-            return view('layouts/components/user/user', ['users' => $responseData['data']]);
-        } else {
-            // Tangani error jika API mengembalikan error
-            return view('layouts/components/user/user', ['error' => 'Failed to retrieve data from API']);
-        }
+    // Debug output to check the structure of the data
+    // var_dump($responseData); 
+    die(); // This will stop execution to allow inspection of the output
+
+    if (isset($responseData['data']) && is_array($responseData['data'])) {
+        var_dump($responseData); 
+        return view('layouts/components/user/user', ['users' => $responseData['data']]);
+    } else {
+        return view('layouts/components/user/user', ['error' => 'Unexpected response format from API.']);
     }
+}
+
 
     public function store()
     {

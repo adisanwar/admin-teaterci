@@ -35,20 +35,26 @@
                         <?php if (isset($users) && is_array($users)): ?>
                             <?php $no = 1; ?>
                             <?php foreach ($users as $user): ?>
-                                <tr>
-                                    <td><?= $no++ ?></td>
-                                    <td><?= isset($user['name']) ? $user['name'] : 'N/A' ?></td>
-                                    <td><?= isset($user['username']) ? $user['username'] : 'N/A' ?></td>
-                                    <td><?= isset($user['isAdmin']) && $user['isAdmin'] ? 'Yes' : 'No' ?></td>
-                                    <td>
-                                        <a href="#" data-toggle="modal" data-target="#editUser<?= $user['username']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                        <form action="<?= base_url('/users/delete/' . $user['username']) ?>" method="post" style="display:inline;">
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                <?php if (is_array($user)): ?> <!-- Ensure each user is an array -->
+                                    <tr>
+                                        <td><?= $no++ ?></td>
+                                        <td><?= $user['name']?></td>
+                                        <td><?= $user['username'] ?></td>
+                                        <td><?= $user['isAdmin'] && $user['isAdmin'] ? 'Yes' : 'No' ?></td>
+                                        <td>
+                                            <a href="#" data-toggle="modal" data-target="#editUser<?= $user['username']; ?>" class="btn btn-sm btn-primary">Edit</a>
+                                            <form action="<?= base_url('/users/delete/' . $user['username']) ?>" method="post" style="display:inline;">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="_method" value="DELETE">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5">Unexpected data format.</td>
+                                    </tr>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
@@ -56,6 +62,7 @@
                             </tr>
                         <?php endif; ?>
                     </tbody>
+
 
                 </table>
             </div>

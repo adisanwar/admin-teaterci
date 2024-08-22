@@ -16,6 +16,15 @@
         </div>
     <?php endif; ?>
 
+    <?php if (session()->getFlashData('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= session()->getFlashData('error') ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
     <!-- Tabel Data Theater -->
     <div class="card shadow mb-4">
         <div class="card-header">
@@ -41,7 +50,7 @@
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= $theater['name'] ?></td>
-                                    <td><?= $theater['photo'] ? '<img src="' . base_url('uploads/' . $theater['photo']) . '" alt="Theater Photo" width="100">' : 'No Photo' ?></td>
+                                    <td><?= $theater['photo'] ? '<img src="' . base_url($theater['photo']) . '" alt="Theater Photo" width="100">' : 'No Photo' ?></td>
                                     <td><?= $theater['location'] ?></td>
                                     <td><?= $theater['capacity'] ?></td>
                                     <td>

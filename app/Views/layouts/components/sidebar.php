@@ -24,7 +24,7 @@
         </a>
         <div id="collapseShow" class="collapse" aria-labelledby="headingShow" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="<?= base_url('tiket') ?>">Show</a>
+                <a class="collapse-item" href="<?= base_url('show') ?>">Show</a>
                 <a class="collapse-item" href="<?= base_url('theaters') ?>">Teater</a>
                 <a class="collapse-item" href="<?= base_url('showtime') ?>">Jadwal</a>
             </div>

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use Error;
 
 class Theater extends BaseController
 {
@@ -50,42 +51,98 @@ class Theater extends BaseController
         }
     }
 
+    // public function store()
+    // {
+    //     $client = service('curlrequest');
+
+    //     // Ambil data dari request POST
+    //     $name = $this->request->getPost('name');
+    //     $location = $this->request->getPost('location');
+    //     $capacity = $this->request->getPost('capacity');
+
+    //     // Siapkan data untuk dikirim ke API
+    //     $data = [
+    //         'name'     => $name,
+    //         'location' => $location,
+    //         'capacity' => $capacity,
+    //     ];
+
+    //     try {
+    //         // Kirim data ke API
+    //         $response = $client->post($this->baseApiUrl . '/theaters', [
+    //             'headers' => $this->headers,
+    //             'form_params' => $data,
+    //         ]);
+
+    //         // Periksa apakah respons berhasil
+    //         if ($response->getStatusCode() === 201) {
+    //             return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
+    //         } else {
+    //             // Dapatkan pesan error dari API jika ada
+    //             $error = $response->getBody();
+    //             return redirect()->back()->with('error', 'Failed to add theater. ' . $error);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+    //     }
+    // }
+
     public function store()
-    {
-        $client = service('curlrequest');
+{
+    $client = service('curlrequest');
 
-        // Ambil data dari request POST
-        $data = [
-            'name' => $this->request->getPost('name'),
-            'location' => $this->request->getPost('location'),
-            'capacity' => $this->request->getPost('capacity'),
+    // Retrieve data from the POST request
+    $name = $this->request->getPost('name');
+    $location = $this->request->getPost('location');
+    $capacity = $this->request->getPost('capacity');
+    $photo = $this->request->getFile('photo');
+
+    // Create the data array for form data
+    $data = [
+        [
+            'name'     => 'name',
+            'contents' => $name
+        ],
+        [
+            'name'     => 'location',
+            'contents' => $location
+        ],
+        [
+            'name'     => 'capacity',
+            'contents' => $capacity
+        ]
+    ];
+
+    // Handle photo upload if a file was uploaded
+    if ($photo && $photo->isValid() && !$photo->hasMoved()) {
+        $data[] = [
+            'name'     => 'photo',
+            'contents' => fopen($photo->getTempName(), 'r'),
+            'filename' => $photo->getClientName() // Add the original filename
         ];
+    }
 
-        // Handle file upload jika ada
-        if ($this->request->getFile('photo')->isValid()) {
-            $photo = $this->request->getFile('photo');
-            $photoName = $photo->getRandomName();
-            $photo->move(WRITEPATH . 'uploads', $photoName);
-            $data['photo'] = $photoName;
-        }
+    var_dump($data);
 
-        $authToken = session()->get('auth_token');
-
-        var_dump($authToken);
-
-        // Lakukan permintaan POST ke API untuk menyimpan data baru
+    try {
+        // Send the request to the API
         $response = $client->post($this->baseApiUrl . '/theaters', [
-            'headers' => $this->headers,
-            'multipart' => $data,
+            'headers'  => $this->headers,
+            'multipart' => $data // Use multipart for file uploads
         ]);
 
-        // Periksa apakah respons berhasil
+        // Check if the request was successful
         if ($response->getStatusCode() === 201) {
             return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
         } else {
-            return redirect()->back()->with('error', 'Failed to add theater.');
+            // Get error message from the API if any
+            $error = $response->getBody();
+            return redirect()->back()->with('error', 'Failed to add theater. ' . $error);
         }
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
     }
+}
 
 
     public function update($id)
