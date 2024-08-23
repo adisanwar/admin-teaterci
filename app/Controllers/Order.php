@@ -38,13 +38,17 @@ class Order extends BaseController
             'headers' => $this->headers, // Menggunakan header dari constructor
         ]);
 
+
+
         // Decode respons JSON ke array PHP
         $responseData = json_decode($response->getBody(), true);
+
+        // var_dump($responseData);
 
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
             // Kirim data ke view
-            return view('layouts/components/order/order', ['orders' => $responseData['data']]);
+            return view('layouts/components/order/order', ['tickets' => $responseData['data']]);
         } else {
             // Tangani error jika API mengembalikan error
             return view('layouts/components/order/order', ['error' => 'Failed to retrieve data from API']);

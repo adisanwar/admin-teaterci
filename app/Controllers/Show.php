@@ -137,7 +137,6 @@ public function store()
     var_dump($data);
     // Send the request to the API
     try {
-        // Lakukan permintaan PUT ke API untuk mengedit data yang ada
     $response = $client->post($this->baseApiUrl . '/shows/', [
         'headers' => $this->headers,
         'multipart' => $data,
@@ -150,7 +149,7 @@ public function store()
         return redirect()->back()->withInput()->with('errors', $responseArray['error']);
     }
 
-    return redirect()->to('/shows')->with('success', 'Show successfully added.');
+    return redirect()->to('/show')->with('success', 'Show successfully added.');
     } catch (\Exception $e) {
         log_message('error', 'API request error: ' . $e->getMessage());
         return redirect()->back()->with('error', 'Failed to add Show. ' . $e->getMessage());
@@ -228,6 +227,8 @@ public function update($id)
         log_message('debug', 'No valid file uploaded or file has already been moved.');
     }
 
+    var_dump($data);
+
     // Ambil data dari request POST
     
     try {
@@ -240,15 +241,16 @@ public function update($id)
     $body = $response->getBody();
     $responseArray = json_decode($body, true);
 
+    // var_dump($responseArray['error']);
     if (isset($responseArray['error'])) {
         return redirect()->back()->withInput()->with('errors', $responseArray['error']);
     }
 
-    return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
+    return redirect()->to('/show')->with('success', 'Theater successfully added.');
     } catch (\Exception $e) {
         log_message('error', 'API request error: ' . $e->getMessage());
         return redirect()->back()->with('error', 'Failed to add theater. ' . $e->getMessage());
-        //throw $th;
+    //     //throw $th;
     }
     
 }
@@ -264,7 +266,7 @@ public function delete($id)
 
     // Periksa apakah respons berhasil
     if ($response->getStatusCode() === 200) {
-        return redirect()->to('/shows')->with('success', 'Show successfully deleted.');
+        return redirect()->to('/show')->with('success', 'Show successfully deleted.');
     } else {
         return redirect()->back()->with('error', 'Failed to delete show.');
     }

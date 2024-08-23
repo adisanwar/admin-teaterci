@@ -26,26 +26,30 @@ class Users extends BaseController
     }
 
     public function index()
-{
-    $client = service('curlrequest');
+    {
+        $client = service('curlrequest');
 
-    $response = $client->get($this->baseApiUrl . '/users/current', [
-        'headers' => $this->headers,
-    ]);
+        // Make a GET request to the API to retrieve the current user's data
+        try {
+            $response = $client->get($this->baseApiUrl . '/users/current', [
+                'headers' => $this->headers,
+            ]);
 
-    $responseData = json_decode($response->getBody(), true);
+            $responseData = json_decode($response->getBody(), true);
 
-    // Debug output to check the structure of the data
-    // var_dump($responseData); 
-    die(); // This will stop execution to allow inspection of the output
-
-    if (isset($responseData['data']) && is_array($responseData['data'])) {
-        var_dump($responseData); 
-        return view('layouts/components/user/user', ['users' => $responseData['data']]);
-    } else {
-        return view('layouts/components/user/user', ['error' => 'Unexpected response format from API.']);
+            if ($response->getStatusCode() == 200) {
+                // Pass the user data to the view
+                return view('layouts/components/user/user', ['users' => $responseData['data']]);
+            } else {
+                // Handle the error and pass the error message to the view
+                return view('layouts/components/user/user', ['error' => 'Failed to retrieve data from API']);
+            }
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during the request
+            log_message('error', 'API request error: ' . $e->getMessage());
+            return view('layouts/components/user/user', ['error' => 'An error occurred: ' . $e->getMessage()]);
+        }
     }
-}
 
 
     public function store()
