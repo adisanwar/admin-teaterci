@@ -43,3 +43,8 @@ $routes->get('/showtime', 'Showtime::index');
 $routes->post('/showtime/store', 'Showtime::store');
 $routes->patch('/showtime/update/(:num)', 'Showtime::update/$1');
 $routes->delete('/showtime/delete/(:num)', 'Showtime::delete/$1');
+
+$routes->get('/shuffle', 'Ticket::shufflePage');
+$routes->post('/shuffle/store', 'Ticket::store');
+$routes->patch('/shuffle/update/(:num)', 'Ticket::update/$1');
+$routes->delete('/shuffle/delete/(:num)', 'Ticket::delete/$1');

@@ -21,7 +21,6 @@ class Theater extends BaseController
         $this->baseImgUrl = env('EXTERNAL_IMG_BASE_URL');
 
 
-
         // Ambil token dari sesi dan set ke header jika ada
         $authToken = session()->get('auth_token');
         $this->headers = [];

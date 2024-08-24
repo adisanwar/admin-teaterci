@@ -244,7 +244,7 @@ public function update($id)
         return redirect()->back()->withInput()->with('errors', $responseArray['error']);
     }
 
-    return redirect()->to('/theaters')->with('success', 'Theater successfully added.');
+    return redirect()->to('/show')->with('success', 'Theater successfully added.');
     } catch (\Exception $e) {
         log_message('error', 'API request error: ' . $e->getMessage());
         return redirect()->back()->with('error', 'Failed to add theater. ' . $e->getMessage());

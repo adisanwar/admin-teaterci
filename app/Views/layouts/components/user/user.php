@@ -2,6 +2,7 @@
 <?= $this->section('content') ?>
 <!-- Mulai Konten Halaman -->
 <div class="container-fluid">
+    <!-- Judul Halaman -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">User Data</h1>
     </div>
@@ -15,6 +16,16 @@
         </div>
     <?php endif; ?>
 
+    <?php if (session()->getFlashData('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= session()->getFlashData('error') ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Tabel Data Users -->
     <div class="card shadow mb-4">
         <div class="card-header">
             <a href="#" data-target="#tambahUser" data-toggle="modal" class="btn btn-sm btn-primary">Tambah User</a>
@@ -34,73 +45,73 @@
                     <tbody>
                         <?php if (isset($users) && is_array($users)): ?>
                             <?php $no = 1; ?>
-                            <?php foreach ($users as $user): ?>
-                                <?php if (is_array($user)): ?> <!-- Ensure each user is an array -->
-                                    <tr>
-                                        <td><?= $no++ ?></td>
-                                        <td><?= $user['name']?></td>
-                                        <td><?= $user['username'] ?></td>
-                                        <td><?= $user['isAdmin'] && $user['isAdmin'] ? 'Yes' : 'No' ?></td>
-                                        <td>
-                                            <a href="#" data-toggle="modal" data-target="#editUser<?= $user['username']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                                            <form action="<?= base_url('/users/delete/' . $user['username']) ?>" method="post" style="display:inline;">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="_method" value="DELETE">
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="5">Unexpected data format.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
+                            <tr>
+                                <td><?= $no++ ?></td>
+                                <td><?= esc($users['name']) ?></td>
+                                <td><?= esc($users['username']) ?></td>
+                                <td><?= esc($users['isAdmin'] ? 'Admin' : 'User') ?></td>
+                                <td>
+                                    <a href="#" data-toggle="modal" data-target="#editUser<?= esc($users['username']); ?>" class="btn btn-sm btn-primary">Edit</a>
+                                    <form action="<?= base_url('/users/delete/' . esc($users['username'])) ?>" method="post" style="display:inline;">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete user <?= esc($users['username']); ?>?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
                         <?php else: ?>
                             <tr>
                                 <td colspan="5">No users available.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
-
-
                 </table>
             </div>
         </div>
     </div>
 
     <!-- Modal Edit User -->
-    <?php foreach ($users as $user): ?>
-        <div class="modal fade" id="editUser<?= $user['username']; ?>" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editUserLabel">Edit User</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form action="<?= base_url('/users/update/' . $user['username']) ?>" method="post">
-                            <input type="hidden" name="_method" value="PATCH">
-                            <div class="form-group">
-                                <label for="name" class="col-form-label">Name</label>
-                                <input type="text" class="form-control" id="name" name="name" value="<?= $user['name'] ?>">
-                            </div>
-                            <div class="form-group">
-                                <label for="isAdmin" class="col-form-label">Admin</label>
-                                <input type="checkbox" id="isAdmin" name="isAdmin" <?= $user['isAdmin'] ? 'checked' : '' ?>>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </form>
-                    </div>
+    <div class="modal fade" id="editUser<?= esc($users['username']); ?>" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserLabel">Edit User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('/users/update/' . esc($users['username'])) ?>" method="post">
+                        <input type="hidden" name="_method" value="PATCH">
+                        <?= csrf_field() ?>
+
+                        <div class="form-group">
+                            <label for="name" class="col-form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<?= esc($users['name']) ?>" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="username" class="col-form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="<?= esc($users['username']) ?>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role" class="col-form-label">Role</label>
+                            <select class="form-control" id="role" name="isAdmin">
+                                <option value="1" <?= $users['isAdmin'] ? 'selected' : '' ?>>Admin</option>
+                                <option value="0" <?= !$users['isAdmin'] ? 'selected' : '' ?>>User</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    <?php endforeach; ?>
+    </div>
 
     <!-- Modal Tambah User -->
     <div class="modal fade" id="tambahUser" tabindex="-1" role="dialog" aria-labelledby="tambahUserLabel" aria-hidden="true">
@@ -113,22 +124,35 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?= base_url('/users/store'); ?>" method="post">
+                    <form action="<?= base_url('/users/store') ?>" method="post">
+                        <?= csrf_field() ?>
+
                         <div class="form-group">
                             <label for="name" class="col-form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name">
+                            <input type="text" class="form-control" id="name" name="name" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="username" class="col-form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username">
+                            <input type="text" class="form-control" id="username" name="username" required>
                         </div>
+
                         <div class="form-group">
-                            <label for="isAdmin" class="col-form-label">Admin</label>
-                            <input type="checkbox" id="isAdmin" name="isAdmin">
+                            <label for="password" class="col-form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
                         </div>
+
+                        <div class="form-group">
+                            <label for="role" class="col-form-label">Role</label>
+                            <select class="form-control" id="role" name="isAdmin">
+                                <option value="1">Admin</option>
+                                <option value="0">User</option>
+                            </select>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Tambah</button>
+                            <button type="submit" class="btn btn-primary">Tambah User</button>
                         </div>
                     </form>
                 </div>
@@ -137,17 +161,9 @@
     </div>
 
     <script>
+        // Panggil plugin dataTables jQuery
         $(document).ready(function() {
             $('#dataTable').DataTable();
         });
     </script>
-</div>
-
-<!-- /.container-fluid -->
-<script>
-    // Panggil plugin dataTables jQuery
-    $(document).ready(function() {
-        $('#dataTable').DataTable();
-    });
-</script>
 <?= $this->endSection() ?>

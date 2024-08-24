@@ -26,44 +26,58 @@ class Users extends BaseController
     }
 
     public function index()
-{
-    $client = service('curlrequest');
+    {
+        $client = service('curlrequest');
 
-    $response = $client->get($this->baseApiUrl . '/users/current', [
-        'headers' => $this->headers,
-    ]);
+        $response = $client->get($this->baseApiUrl . '/users/current', [
+            'headers' => $this->headers,
+        ]);
 
-    $responseData = json_decode($response->getBody(), true);
+        $responseData = json_decode($response->getBody(), true);
 
-    // Debug output to check the structure of the data
-    // var_dump($responseData); 
-    die(); // This will stop execution to allow inspection of the output
-
-    if (isset($responseData['data']) && is_array($responseData['data'])) {
-        var_dump($responseData); 
-        return view('layouts/components/user/user', ['users' => $responseData['data']]);
-    } else {
-        return view('layouts/components/user/user', ['error' => 'Unexpected response format from API.']);
+        if (isset($responseData['data']) && is_array($responseData['data'])) {
+            // var_dump($responseData); 
+            return view('layouts/components/user/user', ['users' => $responseData['data']]);
+        } else {
+            return view('layouts/components/user/user', ['error' => 'Unexpected response format from API.']);
+        }
     }
-}
 
 
     public function store()
     {
         $client = service('curlrequest');
 
-        // Ambil data dari request POST
-        $data = [
-            'name' => $this->request->getPost('name'),
-            'username' => $this->request->getPost('username'),
-            'isAdmin' => $this->request->getPost('isAdmin') ? true : false,
-        ];
+        $post = $this->request->getPost();
 
+        $data = [
+            [
+                'name'     => 'name',
+                'contents' => $post['name']
+            ],
+            [
+                'name'     => 'username',
+                'contents' => $post['username']
+            ],
+            [
+                'name'     => 'password',
+                'contents' => $post['password']
+            ],
+            [
+                'name'     => 'isAdmin',
+                'contents' => filter_var($post['isAdmin'], FILTER_VALIDATE_BOOLEAN)
+            ],
+            ];
+
+            var_dump($data);
+
+        
         // Lakukan permintaan POST ke API untuk menyimpan data baru
         $response = $client->post($this->baseApiUrl . '/users', [
-            'headers' => $this->headers,
-            'form_params' => $data,
+            'headers' => array_merge($this->headers, ['Content-Type' => 'application/json']),
+            'json' => $data, // Gunakan 'json' untuk mengirim data dalam format JSON
         ]);
+        
 
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 201) {
