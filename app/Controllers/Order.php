@@ -48,7 +48,7 @@ class Order extends BaseController
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
             // Kirim data ke view
-            return view('layouts/components/order/order', ['tickets' => $responseData['data']]);
+            return view('layouts/components/order/order', ['orders' => $responseData['data']]);
         } else {
             // Tangani error jika API mengembalikan error
             return view('layouts/components/order/order', ['error' => 'Failed to retrieve data from API']);
