@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <!-- Judul Halaman -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Show data</h1>
+        <h1 class="h3 mb-0 text-gray-800">Order data</h1>
     </div>
 
     <?php
@@ -23,7 +23,7 @@
     <!-- Tabel Data Order -->
     <div class="card shadow mb-4">
         <div class="card-header">
-            <a href="" data-target="#tambahShow" data-toggle="modal" class="btn btn-sm btn-primary">Tambah Order</a>
+            <!-- <a href="" data-target="#tambahShow" data-toggle="modal" class="btn btn-sm btn-primary">Tambah Order</a> -->
         </div>
         <div class="card-body">
             <div class="table-responsive">
