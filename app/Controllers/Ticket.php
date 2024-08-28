@@ -51,12 +51,12 @@ class Ticket extends BaseController
         }
     }
 
-    public function shufflePage()
+    public function shufflePageIndex()
     {
         $client = service('curlrequest');
 
         // Lakukan permintaan GET ke API untuk mendapatkan data show saat ini
-        $response = $client->get($this->baseApiUrl . '/tickets', [
+        $response = $client->get($this->baseApiUrl . '/tickets/shuffle-tickets', [
             'headers' => $this->headers, // Menggunakan header dari constructor
         ]);
 
@@ -68,7 +68,7 @@ class Ticket extends BaseController
         // Periksa apakah respons berhasil
         if (isset($responseData['data']) && is_array($responseData['data'])) {
             // Kirim data ke view
-            return view('layouts/components/tiket/shuffle', ['tickets' => $responseData['data']]);
+            return view('layouts/components/tiket/shuffle', ['shuffle' => $responseData['data']]);
         } else {
             // Tangani error jika API mengembalikan error
             return view('layouts/components/tiket/shuffle', ['error' => 'Failed to retrieve data from API']);

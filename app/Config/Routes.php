@@ -5,6 +5,8 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
+
 $routes->get('/', 'Home::dashboard');
 $routes->get('/dashboard', 'Home::dashboard');
 // Auth
@@ -13,6 +15,7 @@ $routes->post('/login/auth', 'Auth::login');
 $routes->delete('/logout', 'Auth::logout');
 
 $routes->get('/users', 'Users::index');
+$routes->get('/users/current', 'Users::get_current_user');
 $routes->post('/users/store', 'Users::store');
 $routes->patch('/users/update/(:any)', 'Users::update/$1');
 $routes->delete('/users/delete/(:any)', 'Users::delete/$1');
@@ -44,7 +47,7 @@ $routes->post('/showtime/store', 'Showtime::store');
 $routes->patch('/showtime/update/(:num)', 'Showtime::update/$1');
 $routes->delete('/showtime/delete/(:num)', 'Showtime::delete/$1');
 
-$routes->get('/shuffle', 'Ticket::shufflePage');
+$routes->get('/shuffle', 'Ticket::shufflePageIndex');
 $routes->post('/shuffle/store', 'Ticket::store');
 $routes->patch('/shuffle/update/(:num)', 'Ticket::update/$1');
 $routes->delete('/shuffle/delete/(:num)', 'Ticket::delete/$1');

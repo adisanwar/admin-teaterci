@@ -10,7 +10,7 @@
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"> Username </span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Username</span>
                 <img class="img-profile rounded-circle"
                     src="<?= base_url('assets/img/undraw_profile.svg') ?>">
             </a>
@@ -32,7 +32,7 @@
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div class="modal-body">Yakin Ingin Logout</div>
+                        <div class="modal-body">Yakin Ingin Logout?</div>
                         <div class="modal-footer">
                             <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                             <form id="logout-form" action="<?= base_url('/logout'); ?>" method="post" style="display: none;">
