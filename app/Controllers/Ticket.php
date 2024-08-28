@@ -74,4 +74,28 @@ class Ticket extends BaseController
             return view('layouts/components/tiket/shuffle', ['error' => 'Failed to retrieve data from API']);
         }
     }
+
+    public function shuffle()
+    {
+        $client = service('curlrequest');
+
+        // Lakukan permintaan GET ke API untuk mendapatkan data show saat ini
+        $response = $client->get($this->baseApiUrl . '/tickets/shuffle-tickets', [
+            'headers' => $this->headers, // Menggunakan header dari constructor
+        ]);
+
+        // Decode respons JSON ke array PHP
+        $responseData = json_decode($response->getBody(), true);
+
+        // var_dump($responseData);
+
+        // Periksa apakah respons berhasil
+        if (isset($responseData['data']) && is_array($responseData['data'])) {
+            // Kirim data ke view
+            return view('layouts/components/tiket/shuffle', ['shuffle' => $responseData['data']]);
+        } else {
+            // Tangani error jika API mengembalikan error
+            return view('layouts/components/tiket/shuffle', ['error' => 'Failed to retrieve data from API']);
+        }
+    }
 }

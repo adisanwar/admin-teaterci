@@ -48,6 +48,6 @@ $routes->patch('/showtime/update/(:num)', 'Showtime::update/$1');
 $routes->delete('/showtime/delete/(:num)', 'Showtime::delete/$1');
 
 $routes->get('/shuffle', 'Ticket::shufflePageIndex');
-$routes->post('/shuffle/store', 'Ticket::store');
+$routes->post('/shuffle/process', 'Ticket::shuffle');
 $routes->patch('/shuffle/update/(:num)', 'Ticket::update/$1');
 $routes->delete('/shuffle/delete/(:num)', 'Ticket::delete/$1');
