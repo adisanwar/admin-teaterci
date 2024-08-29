@@ -97,9 +97,6 @@
                         <button type="submit" class="btn btn-primary">Acak Tiket</button>
                     </form>
 
-                    <!-- Area untuk menampilkan pesan -->
-                    <div id="message"></div>
-
                     <!-- Tabel untuk menampilkan hasil pengacakan -->
                     <div class="table-responsive">
                         <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0">
@@ -117,6 +114,9 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div id="message"></div>
+
                 </div>
             </div>
         </div>
@@ -124,8 +124,8 @@
 </div>
 
 <!-- JavaScript untuk menangani AJAX dan memperbarui tabel -->
-<script src="<?= base_url('assets/template/jquery/jquery.min.js');?>"></script>
-<!-- base_url('assets/template/jquery/jquery.min.js') -->
+<script src="<?= base_url('assets/template/jquery/jquery.min.js'); ?>"></script>
+<!-- base_url('assets/template/jquery/jquery.min.js'); -->
 <script>
     $(document).ready(function() {
         $('#shuffleForm').on('submit', function(e) {
@@ -151,9 +151,8 @@
                     displayMessage('Sedang memproses...', 'info');
                 },
                 success: function(response) {
-                    console.log("Data received: ", response); // Menampilkan data yang diterima ke konsol
                     $('#shuffleForm button[type="submit"]').prop('disabled', false);
-                    if (response.data) {
+                    if (response.data && response.data.length > 0) {
                         displayMessage(response.message, 'success');
                         updateTable(response.data);
                     } else {
@@ -161,7 +160,6 @@
                         clearTable();
                     }
                 },
-
                 error: function(xhr, status, error) {
                     $('#shuffleForm button[type="submit"]').prop('disabled', false);
                     console.error(error);
@@ -197,22 +195,27 @@
                     tableBody.append(row);
                 });
 
-                // Reinitialize DataTable
-                if ($.fn.DataTable.isDataTable('#dataTable2')) {
-                    $('#dataTable2').DataTable().destroy();
+                // Inisialisasi DataTable jika belum diinisialisasi sebelumnya
+                if (!$.fn.DataTable.isDataTable('#dataTable2')) {
+                    $('#dataTable2').DataTable({
+                        "autoWidth": false
+                    });
                 }
-                $('#dataTable2').DataTable();
             } else {
                 clearTable();
             }
         }
-
 
         // Fungsi untuk mengosongkan tabel
         function clearTable() {
             var tableBody = $('#tmpTicketsTableBody');
             tableBody.empty();
             tableBody.append('<tr><td colspan="3" class="text-center">No tickets available.</td></tr>');
+
+            // Hancurkan DataTable jika sudah diinisialisasi sebelumnya
+            if ($.fn.DataTable.isDataTable('#dataTable2')) {
+                $('#dataTable2').DataTable().clear().destroy();
+            }
         }
 
         // Fungsi untuk mencegah XSS
