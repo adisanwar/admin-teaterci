@@ -76,40 +76,36 @@ class Ticket extends BaseController
     }
 
     public function shuffle($id = null)
-    {
-        $client = service('curlrequest');
-    
-        // Menangkap data POST dari form
-        $post = $this->request->getPost();
-    
-        // Misalnya, Anda ingin mengirimkan shuffleCount sebagai bagian dari URL
-        $shuffleCount = isset($post['shuffleCount']) ? $post['shuffleCount'] : null;
-    
-        if ($shuffleCount === null) {
-            return redirect()->back()->with('error', 'Shuffle count is required.');
-        }
-    
-        // Membuat URL dengan parameter shuffleCount
-        $url = $this->baseApiUrl . '/tickets/shuffle-tickets/' . $shuffleCount;
-    
-        // Lakukan permintaan POST ke API dengan URL yang sudah diatur
-        $response = $client->post($url, [
-            'headers' => $this->headers, // Menggunakan header dari constructor
-        ]);
-    
-        // Decode respons JSON ke array PHP
-        $responseData = json_decode($response->getBody(), true);
-    
-        var_dump($responseData);
-        // Periksa apakah respons berhasil
-        if (isset($responseData['data']) && is_array($responseData['data'])) {
-            // Kirim data ke view
-            return view('layouts/components/tiket/shuffle', ['shuffledTickets' => $responseData['data']]);
-        } else {
-            // Tangani error jika API mengembalikan error
-            return view('layouts/components/tiket/shuffle', ['error' => 'Failed to retrieve data from API']);
-        }
+{
+    $client = service('curlrequest');
+
+    // Menangkap data POST dari form
+    $post = $this->request->getPost();
+
+    // Misalnya, Anda ingin mengirimkan shuffleCount sebagai bagian dari URL
+    $shuffleCount = isset($post['shuffleCount']) ? $post['shuffleCount'] : null;
+
+    if ($shuffleCount === null) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Shuffle count is required.']);
     }
-    
-    
+
+    // Membuat URL dengan parameter shuffleCount
+    $url = $this->baseApiUrl . '/tickets/shuffle-tickets/' . $shuffleCount;
+
+    // Lakukan permintaan POST ke API dengan URL yang sudah diatur
+    $response = $client->post($url, [
+        'headers' => $this->headers, // Menggunakan header dari constructor
+    ]);
+
+    // Decode respons JSON ke array PHP
+    $responseData = json_decode($response->getBody(), true);
+
+    // Periksa apakah respons berhasil
+    if (isset($responseData['data']) && is_array($responseData['data'])) {
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Tickets shuffled successfully', 'data' => $responseData['data']]);
+    } else {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to retrieve data from API']);
+    }
+}
+
 }
