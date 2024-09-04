@@ -32,7 +32,7 @@
                         <tr>
                             <th>#</th>
                             <th>Order ID</th>
-                            <th>Amount</th>
+                            <th>Price</th>
                             <th>Status</th>
                             <th>Show Title</th>
                             <th>Show Description</th>

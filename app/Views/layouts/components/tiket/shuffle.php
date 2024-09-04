@@ -25,7 +25,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Ticket ID</th>
+                    <th>Nama</th>
                     <th>Contact ID</th>
                     <th>Shuffled At</th>
                 </tr>
@@ -66,19 +66,21 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#shuffleForm button[type="submit"]').prop('disabled', false);
+
+                // Memeriksa apakah respons API mengandung status sukses atau error
                 if (response.status === 'success') {
-                    displayMessage(response.message, 'success');
-                    updateTable(response.data);
+                    displayMessage(response.message || 'Tiket berhasil diacak!', 'success');
+                    updateTable(response.data); // Memperbarui tabel jika sukses
                 } else {
-                    displayMessage(response.message, 'danger');
-                    clearTable();
+                    displayMessage(response.message || 'Terjadi kesalahan saat pengacakan tiket.', 'danger');
+                    clearTable(); // Kosongkan tabel jika gagal
                 }
             },
             error: function(xhr, status, error) {
                 $('#shuffleForm button[type="submit"]').prop('disabled', false);
-                console.error(error);
-                displayMessage('Terjadi kesalahan saat memproses permintaan.', 'danger');
-                clearTable();
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan saat memproses permintaan.';
+                displayMessage(errorMessage, 'danger');
+                clearTable(); // Kosongkan tabel jika ada error
             }
         });
     });
@@ -102,8 +104,8 @@ $(document).ready(function() {
         if (data.length > 0) {
             $.each(data, function(index, ticket) {
                 var row = '<tr>' +
-                    // '<td>' + (index + 1) + '</td>' +
-                    '<td>' + escapeHtml(ticket.ticketId) + '</td>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + escapeHtml(ticket.contact.fullname) + '</td>' +
                     '<td>' + escapeHtml(ticket.contactId) + '</td>' +
                     '<td>' + new Date(ticket.shuffledAt).toLocaleString() + '</td>' +
                     '</tr>';
@@ -135,5 +137,6 @@ $(document).ready(function() {
     }
 });
 </script>
+
 
 <?= $this->endSection() ?>

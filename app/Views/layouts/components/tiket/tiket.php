@@ -27,8 +27,8 @@
                             <th>Seat Number</th>
                             <th>Purchase Date</th>
                             <th>Status</th>
-                            <th>Show ID</th>
-                            <th>Contact ID</th>
+                            <th>Show</th>
+                            <th>Contact</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -41,8 +41,8 @@
                                 <td><?= $ticket['seatNumber'] ?? 'N/A' ?></td>
                                 <td><?= date('D d F Y H:i:s', strtotime($ticket['purchaseDate'])) ?></td>
                                 <td><?= $ticket['status'] ?? 'N/A' ?></td>
-                                <td><?= $ticket['showId'] ?></td>
-                                <td><?= $ticket['contactId'] ?></td>
+                                <td><?= $ticket['show']['title'] ?></td>
+                                <td><?= $ticket['contact']['fullname'] ?></td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-primary">View</a>
                                     <a href="<?= base_url('/ticket/delete/' . $ticket['id']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this ticket?')">Delete</a>
