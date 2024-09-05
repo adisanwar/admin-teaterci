@@ -68,10 +68,10 @@ class Ticket extends BaseController
         // Periksa apakah respons berhasil
         if (isset($responseData['data']) && is_array($responseData['data'])) {
             // Kirim data ke view
-            return view('layouts/components/tiket/shuffle', ['shuffle' => $responseData['data']]);
+            return view('layouts/components/tiket/tmpshuffle', ['shuffle' => $responseData['data']]);
         } else {
             // Tangani error jika API mengembalikan error
-            return view('layouts/components/tiket/shuffle', ['error' => 'Failed to retrieve data from API']);
+            return view('layouts/components/tiket/tmpshuffle', ['error' => 'Failed to retrieve data from API']);
         }
     }
 
