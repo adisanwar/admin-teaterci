@@ -4,11 +4,13 @@
 <div class="container-fluid">
     <!-- Judul Halaman -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tiket data</h1>
+        <h1 class="h3 mb-0 text-gray-800">Tiket Data</h1>
     </div>
+
     <!-- Area untuk menampilkan pesan -->
     <div id="message"></div>
-<?php if (session()->getFlashData('success')): ?>
+
+    <?php if (session()->getFlashData('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= session()->getFlashData('success') ?>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -16,6 +18,7 @@
             </button>
         </div>
     <?php endif; ?>
+
     <!-- Form untuk input angka dan tombol Acak Tiket -->
     <form id="shuffleForm" class="form-inline mb-4">
         <div class="form-group mr-2">
@@ -24,8 +27,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Acak Tiket</button>
     </form>
-
-    
 
     <!-- Tabel Data Tiket -->
     <div class="card shadow mb-4">
@@ -43,11 +44,11 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="ticketTableBody">
                     <?php if (isset($tickets) && is_array($tickets)): ?>
                         <?php $no = 1; ?>
                         <?php foreach ($tickets as $ticket): ?>
-                            <tr>
+                            <tr data-ticket-id="<?= $ticket['id'] ?>">
                                 <td><?= $no++ ?></td>
                                 <td><?= $ticket['seatNumber'] ?? 'N/A' ?></td>
                                 <td><?= date('D d F Y H:i:s', strtotime($ticket['purchaseDate'])) ?></td>
@@ -78,6 +79,83 @@
 
 <script>
 $(document).ready(function() {
+    // Fungsi untuk menampilkan pesan
+    function displayMessage(message, type) {
+        var messageHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+            message +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            '</div>';
+        $('#message').html(messageHtml);
+    }
+
+    // Fungsi untuk memperbarui tabel dengan data baru tanpa mengosongkan tabel
+    function updateTable(data) {
+        var tableBody = $('#ticketTableBody');
+        var existingIds = [];
+
+        // Ambil semua ID tiket yang sudah ada di tabel
+        $('#ticketTableBody tr').each(function() {
+            var ticketId = $(this).data('ticket-id');
+            if (ticketId) {
+                existingIds.push(parseInt(ticketId));
+            }
+        });
+
+        if (data.length > 0) {
+            $.each(data, function(index, ticket) {
+                // Tambahkan hanya data baru yang belum ada di tabel
+                if (!existingIds.includes(ticket.id)) {
+                    var row = '<tr data-ticket-id="' + ticket.id + '">' +
+                        '<td>' + (index + 1) + '</td>' +
+                        '<td>' + (ticket.seatNumber ?? 'N/A') + '</td>' +
+                        '<td>' + new Date(ticket.purchaseDate).toLocaleString() + '</td>' +
+                        '<td>' + (ticket.status ?? 'N/A') + '</td>' +
+                        '<td>' + escapeHtml(ticket.show.title) + '</td>' +
+                        '<td>' + escapeHtml(ticket.contact.fullname) + '</td>' +
+                        '<td>' +
+                            '<a href="#" class="btn btn-sm btn-primary">View</a>' +
+                            '<a href="<?= base_url('/ticket/delete/') ?>' + ticket.id + '" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure you want to delete this ticket?\')">Delete</a>' +
+                        '</td>' +
+                        '</tr>';
+                    tableBody.append(row);
+                }
+            });
+
+            // Reinitialize DataTable jika diperlukan
+            if ($.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable().draw();
+            }
+        }
+    }
+
+    // Fungsi untuk polling setiap 1 detik
+    // function pollData() {
+    //     $.ajax({
+    //         url: '', // Sesuaikan dengan endpoint Anda untuk mendapatkan data tiket terbaru
+    //         type: 'GET',
+    //         dataType: 'json',
+    //         success: function(response) {
+    //             if (response.status === 'success') {
+    //                 updateTable(response.data);
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Error fetching ticket data:', error);
+    //         }
+    //     });
+    // }
+
+    // Jalankan polling setiap 1 detik
+    // setInterval(pollData, 1000); // Polling setiap 1000ms atau 1 detik
+
+    // Fungsi untuk mencegah XSS
+    function escapeHtml(text) {
+        return $('<div>').text(text).html();
+    }
+
+    // Event untuk tombol shuffle (acak tiket)
     $('#shuffleForm').on('submit', function(e) {
         e.preventDefault(); // Mencegah pengiriman form secara default
 
@@ -87,7 +165,7 @@ $(document).ready(function() {
             return;
         }
 
-        // Kirim data via AJAX
+        // Kirim data via AJAX untuk melakukan proses shuffle
         $.ajax({
             url: '<?= base_url('/shuffle/process') ?>', // Sesuaikan dengan route Anda
             type: 'POST',
@@ -100,81 +178,28 @@ $(document).ready(function() {
             success: function(response) {
                 $('#shuffleForm button[type="submit"]').prop('disabled', false);
 
-                // Memeriksa apakah respons API mengandung status sukses atau error
                 if (response.status === 'success') {
                     displayMessage(response.message || 'Tiket berhasil diacak!', 'success');
-                    updateTable(response.data); // Memperbarui tabel jika sukses
+                    updateTable(response.data); // Perbarui tabel dengan hasil shuffle
                 } else {
                     displayMessage(response.message || 'Terjadi kesalahan saat pengacakan tiket.', 'danger');
-                    clearTable(); // Kosongkan tabel jika gagal
                 }
             },
             error: function(xhr, status, error) {
                 $('#shuffleForm button[type="submit"]').prop('disabled', false);
                 var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan saat memproses permintaan.';
                 displayMessage(errorMessage, 'danger');
-                clearTable(); // Kosongkan tabel jika ada error
             }
         });
     });
-
-    // Fungsi untuk menampilkan pesan
-    function displayMessage(message, type) {
-        var messageHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
-            message +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            '</div>';
-        $('#message').html(messageHtml);
-    }
-
-    // Fungsi untuk memperbarui tabel dengan data baru
-    function updateTable(data) {
-        var tableBody = $('#shuffleTableBody');
-        tableBody.empty(); // Kosongkan isi tabel
-
-        if (data.length > 0) {
-            $.each(data, function(index, ticket) {
-                var row = '<tr>' +
-                    '<td>' + (index + 1) + '</td>' +
-                    '<td>' + escapeHtml(ticket.contact.fullname) + '</td>' +
-                    '<td>' + escapeHtml(ticket.contactId) + '</td>' +
-                    '<td>' + new Date(ticket.shuffledAt).toLocaleString() + '</td>' +
-                    '</tr>';
-                tableBody.append(row);
-            });
-
-            // Reinitialize DataTable jika diperlukan
-            if ($.fn.DataTable.isDataTable('#shuffleTable')) {
-                $('#shuffleTable').DataTable().destroy();
-            }
-            $('#shuffleTable').DataTable({
-                "autoWidth": false
-            });
-        } else {
-            clearTable();
-        }
-    }
-
-    // Fungsi untuk mengosongkan tabel
-    function clearTable() {
-        var tableBody = $('#shuffleTableBody');
-        tableBody.empty();
-        tableBody.append('<tr><td colspan="4" class="text-center">No tickets available.</td></tr>');
-    }
-
-    // Fungsi untuk mencegah XSS
-    function escapeHtml(text) {
-        return $('<div>').text(text).html();
-    }
 });
 </script>
-<!-- /.container-fluid -->
+
+<!-- DataTables Initialization -->
 <script>
-    // Panggil plugin dataTables jQuery
     $(document).ready(function() {
         $('#dataTable').DataTable();
     });
 </script>
+
 <?= $this->endSection() ?>

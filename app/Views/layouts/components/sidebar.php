@@ -47,7 +47,7 @@
         <div id="collapseTicket" class="collapse" aria-labelledby="headingTicket" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="<?= base_url('tiket') ?>">History</a>
-                <a class="collapse-item" href="<?= base_url('shuffle') ?>">Undi Tiket</a>
+                <a class="collapse-item" href="<?= base_url('shuffle') ?>">Tmp Tiket</a>
                 <!-- <a class="collapse-item" href="#">Jadwal</a> -->
             </div>
         </div>
