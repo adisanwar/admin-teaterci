@@ -35,8 +35,6 @@ class Theater extends BaseController
     {
         $client = new Client();
 
-        $authToken = session()->get('auth_token');
-
         // Lakukan permintaan GET ke API untuk mendapatkan data teater saat ini
         $response = $client->get($this->baseApiUrl . '/theaters/current', [
             'headers' => $this->headers,
@@ -44,6 +42,8 @@ class Theater extends BaseController
 
         // Decode respons JSON ke array PHP
         $responseData = json_decode($response->getBody(), true);
+        
+        // var_dump($responseData);
 
         // Periksa apakah respons berhasil
         if ($response->getStatusCode() === 200) {
@@ -67,17 +67,17 @@ class Theater extends BaseController
         $post = $this->request->getPost();
         $photo = $this->request->getFile('photo');
 
-        if (
-            !$this->validate([
-                'name' => 'required',
-                'photo' => 'uploaded[image]|is_image[image]|max_size[image,1024]',
-                'price' => 'required|numeric',
-                'location' => 'required',
-                'capacity' => 'required',
-            ])
-        ) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+        // if (
+        //     !$this->validate([
+        //         'name' => 'required',
+        //         'photo' => 'uploaded[image]|is_image[image]|max_size[image,1024]',
+        //         'price' => 'required|numeric',
+        //         'location' => 'required',
+        //         'capacity' => 'required',
+        //     ])
+        // ) {
+        //     return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        // }
     
         // Create the data array for form data
         $data = [
@@ -133,6 +133,8 @@ class Theater extends BaseController
         //         'headers' => ['Content-Type' => $photo->getClientMimeType()],
         //     ];
         // }
+
+        // var_dump($data);
     
         try {
             // Send the request to the API
