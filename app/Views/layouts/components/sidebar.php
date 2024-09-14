@@ -40,24 +40,32 @@
     <!-- <hr class="sidebar-divider"> -->
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTicket" aria-expanded="true" aria-controls="collapseTicket">
-            <i class="fas fa-fw fa-solid fa-ticket"></i>
-            <span>Tiket</span>
-        </a>
-        <div id="collapseTicket" class="collapse" aria-labelledby="headingTicket" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="<?= base_url('tiket') ?>">History</a>
-                <a class="collapse-item" href="<?= base_url('shuffle') ?>">Tmp Tiket</a>
-                <!-- <a class="collapse-item" href="#">Jadwal</a> -->
-            </div>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTicket" aria-expanded="true" aria-controls="collapseTicket">
+        <i class="fas fa-fw fa-ticket-alt"></i>
+        <span>Tiket</span>
+    </a>
+    <div id="collapseTicket" class="collapse" aria-labelledby="headingTicket" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="<?= base_url('tiket') ?>">History</a>
+            <a class="collapse-item" href="<?= base_url('shuffle/tmpshuffle') ?>">Temp Tiket</a>
         </div>
-    </li>
+    </div>
+</li>
+
     <!-- <hr class="sidebar-divider"> -->
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="<?= base_url('users') ?>">
-            <i class="fas fa-fw fa-users"></i>
-            <span>Users</span></a>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsers" aria-expanded="true" aria-controls="collapseUsers">
+            <i class="fas fa-fw fa-solid fa-users"></i>
+            <span>Users</span>
+        </a>
+       <div id="collapseUsers" class="collapse" aria-labelledby="headingTicket" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="<?= base_url('users') ?>">Users</a>
+                <a class="collapse-item" href="<?= base_url('contact') ?>">Contact</a>
+                <a class="collapse-item" href="<?= base_url('address') ?>">Alamat</a>
+            </div>
+        </div>
     </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
