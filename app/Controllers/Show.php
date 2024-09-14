@@ -134,7 +134,7 @@ public function store()
     // 'showtimeId' => $this->request->getPost('showtime_id'), 
     // ];
 
-    var_dump($data);
+    // var_dump($data);
     // Send the request to the API
     try {
     $response = $client->post($this->baseApiUrl . '/shows/', [
