@@ -55,17 +55,9 @@
     <!-- <hr class="sidebar-divider"> -->
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsers" aria-expanded="true" aria-controls="collapseUsers">
-            <i class="fas fa-fw fa-solid fa-users"></i>
-            <span>Users</span>
-        </a>
-       <div id="collapseUsers" class="collapse" aria-labelledby="headingTicket" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="<?= base_url('users') ?>">Users</a>
-                <a class="collapse-item" href="<?= base_url('contact') ?>">Contact</a>
-                <a class="collapse-item" href="<?= base_url('address') ?>">Alamat</a>
-            </div>
-        </div>
+    <a class="nav-link" href="<?= base_url('users') ?>">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Users</span></a>
     </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

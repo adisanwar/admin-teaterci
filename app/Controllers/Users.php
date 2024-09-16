@@ -93,29 +93,41 @@ class Users extends BaseController
 }
 
 
-    public function update($username)
-    {
-        $client = service('curlrequest');
+public function update($username)
+{
+    $client = service('curlrequest');
 
-        // Ambil data dari request POST
-        $data = [
-            'name' => $this->request->getPost('name'),
-            'isAdmin' => $this->request->getPost('isAdmin') ? true : false,
-        ];
+    $post = $this->request->getPost();
 
-        // Lakukan permintaan PATCH ke API untuk mengedit data yang ada
-        $response = $client->patch($this->baseApiUrl . '/users/' . $username, [
-            'headers' => $this->headers,
-            'form_params' => $data,
-        ]);
+    // Gather data from the POST request
+    $data = [
+        'name'     => $post['name'],
+        'isAdmin'  => filter_var($post['isAdmin'], FILTER_VALIDATE_BOOLEAN),
+        'username' => $post['username'], // Include the new username if needed
+    ];
 
-        // Periksa apakah respons berhasil
-        if ($response->getStatusCode() === 200) {
-            return redirect()->to('/users')->with('success', 'User successfully updated.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to update user.');
-        }
+    // Include the password only if it is not empty
+    if (!empty($post['password'])) {
+        $data['password'] = $post['password'];
     }
+
+    var_dump($data);
+
+    // Make the PATCH request to the API to update the existing data
+    $response = $client->patch($this->baseApiUrl . '/users/' . $username, [
+        'headers' => array_merge($this->headers, ['Content-Type' => 'application/json']),
+        'json' => $data, // Use 'json' to send the data in JSON format
+    ]);
+
+    // Check if the response is successful
+    if ($response->getStatusCode() === 200) {
+        return redirect()->to('/users')->with('success', 'User successfully updated.');
+    } else {
+        return redirect()->back()->with('error', 'Failed to update user.');
+    }
+}
+
+
 
     public function delete($username)
     {
@@ -133,4 +145,5 @@ class Users extends BaseController
             return redirect()->back()->with('error', 'Failed to delete user.');
         }
     }
+
 }

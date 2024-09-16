@@ -96,7 +96,12 @@
 
                             <div class="form-group">
                                 <label for="username" class="col-form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" value="<?= esc($user['username']) ?>" required>
+                                <input type="text" class="form-control" id="username" name="username" value="<?= esc($user['username']) ?>" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="col-form-label">Password</label>
+                                <input type="text" class="form-control" id="password" name="password">
                             </div>
 
                             <div class="form-group">
@@ -112,6 +117,7 @@
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -145,7 +151,7 @@
 
                         <div class="form-group">
                             <label for="password" class="col-form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="text" class="form-control" id="password" name="password" required>
                         </div>
 
                         <div class="form-group">
@@ -173,4 +179,3 @@
         });
     </script>
     <?= $this->endSection() ?>
-    
