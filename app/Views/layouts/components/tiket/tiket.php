@@ -128,7 +128,7 @@ $(document).ready(function() {
             data: { shuffleCount: shuffleCount },
             dataType: 'json',
             beforeSend: function() {
-                $('#shuffleForm button[type="submit"]').prop('disabled', true);
+                $('#shuffleForm button[type="submit"]').prop('disabled', false);
                 displayMessage('Sedang memproses...', 'info');
             },
             success: function(response) {
